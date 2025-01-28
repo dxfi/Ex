@@ -4,117 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minting History</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .status-success {
-            color: green;
-        }
-        .status-failed {
-            color: red;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 <body>
     <h1>Minting History</h1>
-    <p>Below is the real-time minting transaction history:</p>
+    <div id="historyContainer"></div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Transaction Hash</th>
-                <th>Address</th>
-                <th>Amount</th>
-                <th>Timestamp</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="transaction-table">
-            <!-- Data minting akan dimuat di sini -->
-        </tbody>
-    </table>
-
-    <!-- Tambahkan Web3.js -->
-    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
-
-    <!-- Tambahkan file JavaScript -->
     <script>
-        // Koneksi ke node blockchain
-const web3 = new Web3('https://opbnb-testnet.infura.io/v3/370f6b9b5d1542ae828ad89d7566dbdf');
+        // URL RPC jaringan (ganti dengan RPC jaringan Anda, misalnya dari Infura atau Alchemy)
+        const RPC_URL = "https://opbnb-testnet-rpc.bnbchain.org"; // Ubah dengan RPC Anda
+        const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URL));
 
-// Alamat kontrak dan ABI
-const contractAddress = "0x01ca226f0d215f6877df1d1c50791cdb0743e2e3";
-const contractABI = [{"inputs":[{"internalType":"address payable","name":"_taxCollector","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"EtherWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokenBurned","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"taxPaid","type":"uint256"}],"name":"TokenMinted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"BURN_PERCENTAGE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"NET_TAX_PER_1000","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"TOKENS_PER_MINT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address payable","name":"newTaxCollector","type":"address"}],"name":"changeTaxCollector","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"mintToken","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"taxCollector","outputs":[{"internalType":"address payable","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawEther","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}];
-const contract = new web3.eth.Contract(contractABI, contractAddress);
+        // Alamat kontrak Anda
+        const CONTRACT_ADDRESS = "0x01ca226f0d215f6877df1d1c50791cdb0743e2e3"; // Ganti dengan alamat kontrak Anda
 
-// Fungsi untuk mendapatkan riwayat transaksi
-async function fetchMintingHistory() {
-    const tableBody = document.getElementById("transaction-table");
+        // ABI kontrak Anda
+        const CONTRACT_ABI = [{"inputs":[{"internalType":"address payable","name":"_taxCollector","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"EtherWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokenBurned","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"taxPaid","type":"uint256"}],"name":"TokenMinted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"BURN_PERCENTAGE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"NET_TAX_PER_1000","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"TOKENS_PER_MINT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address payable","name":"newTaxCollector","type":"address"}],"name":"changeTaxCollector","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"mintToken","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"taxCollector","outputs":[{"internalType":"address payable","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawEther","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 
-    try {
-        const events = await contract.getPastEvents('Transfer', {
-            fromBlock: 0,
-            toBlock: 'latest',
-        });
+        // Inisialisasi kontrak
+        const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
-        events.forEach((event) => {
-            const { transactionHash, returnValues } = event;
-            const row = document.createElement("tr");
+        // Fungsi untuk mengambil riwayat minting
+        async function fetchMintingHistory() {
+            try {
+                // Ambil semua event Transfer dari blok awal sampai blok terbaru
+                const events = await contract.getPastEvents('Transfer', {
+                    fromBlock: 0, // Mulai dari blok genesis
+                    toBlock: 'latest' // Sampai blok terakhir
+                });
 
-            row.innerHTML = `
-                <td>${transactionHash}</td>
-                <td>${returnValues.to}</td>
-                <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
-                <td>${new Date().toLocaleString()}</td>
-                <td class="status-success">Success</td>
-            `;
+                console.log("Riwayat Minting (Transfer Events):", events);
 
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error("Error fetching minting history:", error);
-    }
-}
+                // Format data event untuk ditampilkan
+                const formattedEvents = events.map(event => ({
+                    from: event.returnValues.from,
+                    to: event.returnValues.to,
+                    value: web3.utils.fromWei(event.returnValues.value, 'ether'), // Konversi ke Ether
+                    blockNumber: event.blockNumber,
+                    transactionHash: event.transactionHash
+                }));
 
-// Fungsi untuk memantau event real-time
-function watchRealTimeEvents() {
-    contract.events.Transfer()
-        .on('data', (event) => {
-            const { transactionHash, returnValues } = event;
-            const tableBody = document.getElementById("transaction-table");
-            const row = document.createElement("tr");
+                // Tampilkan data di konsol
+                console.table(formattedEvents);
 
-            row.innerHTML = `
-                <td>${transactionHash}</td>
-                <td>${returnValues.to}</td>
-                <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
-                <td>${new Date().toLocaleString()}</td>
-                <td class="status-success">Success</td>
-            `;
+                // Jika ingin menampilkan di UI, gunakan DOM
+                const historyContainer = document.getElementById("historyContainer");
+                if (historyContainer) {
+                    historyContainer.innerHTML = formattedEvents.map(event => `
+                        <div>
+                            <p>From: ${event.from}</p>
+                            <p>To: ${event.to}</p>
+                            <p>Amount: ${event.value} AI</p>
+                            <p>Block: ${event.blockNumber}</p>
+                            <p>Transaction: <a href="https://opbnb-testnet.bscscan.com/tx/${event.transactionHash}" target="_blank">${event.transactionHash}</a></p>
+                        </div>
+                        <hr>
+                    `).join("");
+                }
+            } catch (error) {
+                console.error("Error fetching minting history:", error);
+            }
+        }
 
-            tableBody.appendChild(row);
-        })
-        .on('error', console.error);
-}
-
-// Memuat data awal dan memantau event real-time
-fetchMintingHistory();
-watchRealTimeEvents();
+        // Panggil fungsi untuk mengambil riwayat minting
+        fetchMintingHistory();
     </script>
 </body>
 </html>
