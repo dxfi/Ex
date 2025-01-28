@@ -4,43 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block Explorer Mini</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .status-success {
-            color: green;
-            font-weight: bold;
-        }
-        .status-pending {
-            color: orange;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <style>/* Atur teks agar rapi dan readable */
+body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    margin: 20px;
+}
+
+/* Tabel */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+/* Garis bawah untuk pembatas setiap baris */
+th, td {
+    border-bottom: 1px solid #aaa; /* Garis horizontal */
+    padding: 10px;
+    text-align: center; /* Penempatan riwayat simetris */
+}
+
+/* Header kolom */
+th {
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
+    border-bottom: 2px solid #555;
+}
+
+/* Teks konten */
+td {
+    font-size: 13px;
+}
+
+/* Garis tengah untuk simetri pembatas antar baris */
+tr:nth-child(even) td {
+    border-bottom: 1px solid #ccc; /* Warna lebih cerah untuk garis bawah */
+}
+
+/* Status yang sukses */
+.status-success {
+    color: green;
+    font-weight: bold;
+}
+
+/* Status yang pending */
+.status-pending {
+    color: orange;
+    font-weight: bold;
+}
+
+/* Penyesuaian hover (opsional) */
+tr:hover td {
+    background-color: rgba(0, 0, 0, 0.05); /* Highlight baris saat dihover */
+}
+
+/* Penyesuaian margin antar elemen */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}</style>
 </head>
 <body>
-    <h1>Block Explorer Mini</h1>
+    <h1>Riwayat Minting Token</h1>
     <table>
         <thead>
             <tr>
@@ -52,25 +82,51 @@
                 <th>Status</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Contoh data statis -->
-            <tr>
-                <td>0x1234abcd5678efgh</td>
-                <td>0xSenderAddress1234</td>
-                <td>0xReceiverAddress5678</td>
-                <td>100.00</td>
-                <td>2025-01-28 12:45:00 UTC</td>
-                <td class="status-success">Success</td>
-            </tr>
-            <tr>
-                <td>0x9876zyxw4321lmno</td>
-                <td>0xSenderAddress9876</td>
-                <td>0xReceiverAddress4321</td>
-                <td>50.00</td>
-                <td>2025-01-28 13:15:00 UTC</td>
-                <td class="status-pending">Pending</td>
-            </tr>
+        <tbody id="transaction-table">
+            <!-- Data dari JS akan muncul di sini -->
         </tbody>
     </table>
+    <script>// Konfigurasi Web3 dan kontrak token
+const Web3 = require('web3');
+const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'); // Ganti dengan endpoint blockchain Anda
+
+const contractAddress = "0xYourContractAddress"; // Alamat kontrak token
+const contractABI = [/* Masukkan ABI kontrak Anda di sini */]; // ABI kontrak token
+
+const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+// Fungsi untuk mendapatkan riwayat minting
+async function fetchMintingHistory() {
+    const tableBody = document.getElementById("transaction-table");
+
+    try {
+        // Contoh event "Transfer" (minting biasanya memicu event ini)
+        const events = await contract.getPastEvents('Transfer', {
+            fromBlock: 0, // Blok awal
+            toBlock: 'latest', // Blok terbaru
+        });
+
+        events.forEach(event => {
+            const { transactionHash, returnValues } = event;
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${transactionHash}</td>
+                <td>${returnValues.from}</td>
+                <td>${returnValues.to}</td>
+                <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
+                <td>${new Date().toISOString()}</td>
+                <td class="status-success">Success</td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching minting history:", error);
+    }
+}
+
+// Panggil fungsi untuk memuat data
+fetchMintingHistory();</script>
 </body>
 </html>
