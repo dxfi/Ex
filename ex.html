@@ -54,87 +54,67 @@
 
     <!-- Tambahkan file JavaScript -->
     <script>
-        // Pastikan Anda menggunakan URL Infura atau node yang valid
+        // Koneksi ke node blockchain
 const web3 = new Web3('https://opbnb-testnet.infura.io/v3/370f6b9b5d1542ae828ad89d7566dbdf');
 
 // Alamat kontrak dan ABI
 const contractAddress = "0x01ca226f0d215f6877df1d1c50791cdb0743e2e3";
 const contractABI = [{"inputs":[{"internalType":"address payable","name":"_taxCollector","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"EtherWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokenBurned","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"taxPaid","type":"uint256"}],"name":"TokenMinted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"TokensWithdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"BURN_PERCENTAGE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"NET_TAX_PER_1000","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"TOKENS_PER_MINT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address payable","name":"newTaxCollector","type":"address"}],"name":"changeTaxCollector","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"mintToken","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"taxCollector","outputs":[{"internalType":"address payable","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawEther","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}];
-
-// Membuat instance kontrak
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Fungsi untuk mendapatkan riwayat minting
+// Fungsi untuk mendapatkan riwayat transaksi
 async function fetchMintingHistory() {
     const tableBody = document.getElementById("transaction-table");
 
     try {
-        // Ambil event `Transfer` dari blok awal hingga blok terbaru
         const events = await contract.getPastEvents('Transfer', {
-            fromBlock: 0, // Bisa disesuaikan dengan blok awal kontrak
+            fromBlock: 0,
             toBlock: 'latest',
         });
 
-        // Bersihkan tabel sebelum menambahkan data baru
-        tableBody.innerHTML = "";
-
-        events.forEach(event => {
+        events.forEach((event) => {
             const { transactionHash, returnValues } = event;
+            const row = document.createElement("tr");
 
-            // Pastikan hanya transaksi minting yang ditampilkan (misalnya jika alamat pengirim adalah address khusus minting)
-            if (returnValues.from === "0x0000000000000000000000000000000000000000") {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${transactionHash}</td>
-                    <td>${returnValues.to}</td>
-                    <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
-                    <td>${new Date(event.blockNumber * 1000).toISOString()}</td> <!-- Waktu transaksi -->
-                    <td class="status-success">Success</td>
-                `;
-                tableBody.appendChild(row);
-            }
+            row.innerHTML = `
+                <td>${transactionHash}</td>
+                <td>${returnValues.to}</td>
+                <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
+                <td>${new Date().toLocaleString()}</td>
+                <td class="status-success">Success</td>
+            `;
+
+            tableBody.appendChild(row);
         });
     } catch (error) {
         console.error("Error fetching minting history:", error);
     }
 }
 
-// Fungsi untuk memantau event `Transfer` secara real-time
+// Fungsi untuk memantau event real-time
 function watchRealTimeEvents() {
-    const tableBody = document.getElementById("transaction-table");
-
-    contract.events.Transfer({
-        fromBlock: 'latest',
-    })
-    .on('data', event => {
-        const { transactionHash, returnValues } = event;
-
-        // Pastikan hanya transaksi minting yang ditampilkan
-        if (returnValues.from === "0x0000000000000000000000000000000000000000") {
+    contract.events.Transfer()
+        .on('data', (event) => {
+            const { transactionHash, returnValues } = event;
+            const tableBody = document.getElementById("transaction-table");
             const row = document.createElement("tr");
+
             row.innerHTML = `
                 <td>${transactionHash}</td>
                 <td>${returnValues.to}</td>
                 <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
-                <td>${new Date().toISOString()}</td>
+                <td>${new Date().toLocaleString()}</td>
                 <td class="status-success">Success</td>
             `;
+
             tableBody.appendChild(row);
-        }
-    })
-    .on('error', error => {
-        console.error("Error watching real-time events:", error);
-    });
+        })
+        .on('error', console.error);
 }
 
-// Fungsi utama untuk memuat data awal dan memantau event
-async function initialize() {
-    await fetchMintingHistory(); // Ambil data awal
-    watchRealTimeEvents(); // Pantau event real-time
-}
-
-// Jalankan fungsi utama saat halaman dimuat
-initialize();a
+// Memuat data awal dan memantau event real-time
+fetchMintingHistory();
+watchRealTimeEvents();
     </script>
 </body>
 </html>
