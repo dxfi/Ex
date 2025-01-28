@@ -150,7 +150,7 @@ hr {
                     value: web3.utils.fromWei(event.returnValues.value, 'ether'), // Konversi ke Ether
                     blockNumber: event.blockNumber,
                     transactionHash: event.transactionHash,
-                    timestamp: event.returnValues.timestamp || Date.now() / 1000 // Ambil timestamp dari event atau gunakan waktu sekarang
+                    timestamp: event.returnValues.timestamp || Date.utc() / 1000 // Ambil timestamp dari event atau gunakan waktu sekarang
                 }));
 
                 // Tampilkan data di konsol
@@ -175,6 +175,11 @@ hr {
                 console.error("Error fetching minting history:", error);
             }
         }
+        
+    // Refresh halaman setiap 5 detik (5000 milidetik)
+    setInterval(function() {
+        location.reload(); // Memuat ulang halaman
+    }, 5000); // 5000 milidetik = 5 detik
 
         // Panggil fungsi untuk mengambil riwayat minting pertama kali
         fetchMintingHistory();
