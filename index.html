@@ -150,7 +150,7 @@ hr {
                     value: web3.utils.fromWei(event.returnValues.value, 'ether'), // Konversi ke Ether
                     blockNumber: event.blockNumber,
                     transactionHash: event.transactionHash,
-                    timestamp: event.returnValues.timestamp || Date.utc() / 1000 // Ambil timestamp dari event atau gunakan waktu sekarang
+                    timestamp: event.returnValues.timestamp || Date.now() / 1000 // Ambil timestamp dari event atau gunakan waktu sekarang
                 }));
 
                 // Tampilkan data di konsol
