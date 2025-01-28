@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Explorer Mini</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .status-success {
+            color: green;
+            font-weight: bold;
+        }
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Block Explorer Mini</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>TxID</th>
+                <th>Alamat Pengirim</th>
+                <th>Alamat Penerima</th>
+                <th>Jumlah Token</th>
+                <th>Waktu Transaksi</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Contoh data statis -->
+            <tr>
+                <td>0x1234abcd5678efgh</td>
+                <td>0xSenderAddress1234</td>
+                <td>0xReceiverAddress5678</td>
+                <td>100.00</td>
+                <td>2025-01-28 12:45:00 UTC</td>
+                <td class="status-success">Success</td>
+            </tr>
+            <tr>
+                <td>0x9876zyxw4321lmno</td>
+                <td>0xSenderAddress9876</td>
+                <td>0xReceiverAddress4321</td>
+                <td>50.00</td>
+                <td>2025-01-28 13:15:00 UTC</td>
+                <td class="status-pending">Pending</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
