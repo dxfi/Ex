@@ -150,7 +150,7 @@ hr {
                     from: event.returnValues.from,
                     to: event.returnValues.to,
                     value: web3.utils.fromWei(event.returnValues.value, 'ether'), // Konversi ke Ether
-                    timestamp: event.returnValues.timestamp || Date.now() / 1000 // Ambil timestamp dari event atau gunakan waktu sekarang
+                    timestamp: utcDate
                 }));
 
                 // Tampilkan data di konsol
@@ -164,9 +164,9 @@ hr {
                             <p><strong>Transaction:</strong> <a href="https://opbnb-testnet.bscscan.com/tx/${event.transactionHash}" target="_blank">${shortenTxid(event.transactionHash)}</a></p>
                             <p><strong>Block:</strong> ${event.blockNumber}</p>
                             <p><strong>Wallet:</strong> ${shortenAddress(event.to)}</p>
-                            <p><strong>Minting.....</strong></p>
+                            <p><strong>Minting. . . . . 🪙 </strong></p>
                             <p><strong>Amount:</strong> ${event.value} AI</p>
-                            <p><strong>Time:</strong> ${formatTimeAgo(event.timestamp)}</p>
+                            <p><strong>Time:</strong> ${event.timestamp}</p> <!-- Menampilkan timestamp dalam format UTC -->
                         </div>
                         <hr>
                     `).join("");
