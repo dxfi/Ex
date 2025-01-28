@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minting History</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* CSS seperti yang Anda berikan sebelumnya */
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Minting History</h1>
+        <div id="historyContainer"></div>
+        <div id="pagination" style="text-align: center; margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        const RPC_URL = "https://opbnb-testnet-rpc.bnbchain.org";
+        const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URL));
+        const CONTRACT_ADDRESS = "0x01cA226f0D215F6877DF1D1C50791CdB0743e2e3";
+        const CONTRACT_ABI = [...]; // ABI Anda di sini
+
+        const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+
+        let allEvents = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function formatTimeAgo(timestamp) {
+            const now = Date.now() / 1000;
+            const secondsAgo = now - timestamp;
+
+            if (secondsAgo < 60) return "Just now";
+            const minutes = Math.floor(secondsAgo / 60);
+            if (minutes < 60) return `${minutes} minute(s) ago`;
+            const hours = Math.floor(secondsAgo / 3600);
+            if (hours < 24) return `${hours} hour(s) ago`;
+            const days = Math.floor(secondsAgo / 86400);
+            return `${days} day(s) ago`;
+        }
+
+        function shortenTxid(txid) {
+            return `${txid.substring(0, 10)}...${txid.substring(txid.length - 10)}`;
+        }
+
+        function shortenAddress(address) {
+            return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+        }
+
+        async function fetchMintingHistory() {
+            try {
+                const events = await contract.getPastEvents('Transfer', {
+                    fromBlock: 0,
+                    toBlock: 'latest'
+                });
+
+                allEvents = events.map(event => ({
+                    from: event.returnValues.from,
+                    to: event.returnValues.to,
+                    value: web3.utils.fromWei(event.returnValues.value, 'ether'),
+                    blockNumber: event.blockNumber,
+                    transactionHash: event.transactionHash,
+                    timestamp: event.returnValues.timestamp || Date.now() / 1000
+                }));
+
+                renderPage(currentPage);
+            } catch (error) {
+                console.error("Error fetching minting history:", error);
+            }
+        }
+
+        function renderPage(page) {
+            const historyContainer = document.getElementById("historyContainer");
+            const pagination = document.getElementById("pagination");
+
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            const paginatedEvents = allEvents.slice(startIndex, endIndex);
+
+            historyContainer.innerHTML = paginatedEvents.map(event => `
+                <div class="event">
+                    <p><strong>From:</strong> ${shortenAddress(event.from)}</p>
+                    <p><strong>To:</strong> ${shortenAddress(event.to)}</p>
+                    <p><strong>Amount:</strong> ${event.value} AI</p>
+                    <p><strong>Block:</strong> ${event.blockNumber}</p>
+                    <p><strong>Transaction:</strong> <a href="https://opbnb-testnet.bscscan.com/tx/${event.transactionHash}" target="_blank">${shortenTxid(event.transactionHash)}</a></p>
+                    <p><strong>Time:</strong> ${formatTimeAgo(event.timestamp)}</p>
+                </div>
+                <hr>
+            `).join("");
+
+            const totalPages = Math.ceil(allEvents.length / itemsPerPage);
+            pagination.innerHTML = Array.from({ length: totalPages }, (_, i) => `
+                <button onclick="changePage(${i + 1})" style="margin: 0 5px;" ${i + 1 === page ? 'disabled' : ''}>
+                    ${i + 1}
+                </button>
+            `).join("");
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderPage(page);
+        }
+
+        fetchMintingHistory();
+        setInterval(fetchMintingHistory, 5000);
+    </script>
+</body>
+</html>
