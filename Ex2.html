@@ -132,7 +132,7 @@ hr {
                 });
 
                 allEvents = events.map(event => ({
-                    from: event.returnValues.from,
+                    from: 
                     to: event.returnValues.to,
                     value: web3.utils.fromWei(event.returnValues.value, 'ether'),
                     blockNumber: event.blockNumber,
