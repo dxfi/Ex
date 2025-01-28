@@ -4,6 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minting History</title>
+    <style>/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Global styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: rgba(0, 0, 0, 0.05); /* Transparent background */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #00BFFF; /* Modern blue color */
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Container for the minting history */
+#historyContainer {
+    width: 100%;
+    max-width: 800px;
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Styling for each minting history item */
+#historyContainer div {
+    background-color: rgba(240, 240, 240, 0.9);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+p {
+    font-size: 1.1rem;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+/* Styling for links */
+a {
+    text-decoration: none;
+    color: #00BFFF;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #FF4500; /* Change color on hover */
+}
+
+/* Styling for transaction hash links */
+hr {
+    margin: 20px 0;
+    border: 0;
+    border-top: 2px solid #ddd;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    #historyContainer {
+        padding: 15px;
+    }
+}</style>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 <body>
