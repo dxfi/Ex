@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Explorer Mini</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f9;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.status-success {
+    color: green;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: orange;
+    font-weight: bold;
+}
+
+td, th {
+    border-right: 1px solid #ddd;
+}
+
+td:last-child, th:last-child {
+    border-right: none;
+}</style>
+</head>
+<body>
+    <h1>Riwayat Minting Token</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>TxID</th>
+                <th>Alamat Penerima</th>
+                <th>Jumlah (Token)</th>
+                <th>Waktu Transaksi</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="transaction-table">
+            <!-- Data dari JS akan muncul di sini -->
+        </tbody>
+    </table>
+
+    <!-- Mengimpor Web3.js dari CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script>// Pastikan Anda sudah mengganti dengan URL Infura Anda atau node Ethereum lainnya
+const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
+
+// Alamat kontrak token dan ABI kontrak
+const contractAddress = "0xYourContractAddress"; // Ganti dengan alamat kontrak token Anda
+const contractABI = [/* Masukkan ABI kontrak Anda di sini */]; // Ganti dengan ABI kontrak token Anda
+
+// Membuat instance kontrak token
+const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+// Fungsi untuk mendapatkan riwayat minting dalam real-time
+async function fetchMintingHistory() {
+    const tableBody = document.getElementById("transaction-table");
+
+    try {
+        // Mendapatkan event Transfer yang menunjukkan minting
+        const events = await contract.getPastEvents('Transfer', {
+            fromBlock: 0, // Blok awal untuk mengambil event
+            toBlock: 'latest', // Blok terbaru
+        });
+
+        events.forEach(event => {
+            const { transactionHash, returnValues } = event;
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${transactionHash}</td>
+                <td>${returnValues.to}</td>
+                <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
+                <td>${new Date().toISOString()}</td> <!-- Waktu transaksi -->
+                <td class="status-success">Success</td> <!-- Status minting sukses -->
+            `;
+
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching minting history:", error);
+    }
+}
+
+// Fungsi untuk memantau event Transfer secara real-time
+function watchRealTimeEvents() {
+    contract.events.Transfer({
+        fromBlock: 'latest' // Mulai memantau dari blok terbaru
+    })
+    .on('data', event => {
+        const { transactionHash, returnValues } = event;
+        const tableBody = document.getElementById("transaction-table");
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${transactionHash}</td>
+            <td>${returnValues.to}</td>
+            <td>${web3.utils.fromWei(returnValues.value, 'ether')}</td>
+            <td>${new Date().toISOString()}</td> <!-- Waktu transaksi -->
+            <td class="status-success">Success</td> <!-- Status minting sukses -->
+        `;
+
+        tableBody.appendChild(row);
+    })
+    .on('error', console.error);
+}
+
+// Memanggil fungsi untuk memuat data awal dan memantau event secara real-time
+fetchMintingHistory();
+watchRealTimeEvents();</script>
+</body>
+</html>
