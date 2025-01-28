@@ -182,5 +182,11 @@ hr {
         fetchMintingHistory();
         setInterval(fetchMintingHistory, 5000);
     </script>
+    <script>
+    // Refresh halaman setiap 10 detik (10000 milidetik)
+    setInterval(function() {
+        location.reload(); // Memuat ulang halaman
+    }, 10000); // 10000 milidetik = 10 detik
+    </script>
 </body>
 </html>
