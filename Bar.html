@@ -98,7 +98,7 @@
 
       // Update tampilan
       document.getElementById('progressFill').style.width = progressPercentage + '%';
-      document.getElementById('progressText').innerText = `${minted} / ${MAX_SUPPLY} Tokens Minted`;
+      document.getElementById('progressText').innerText = `${progressPercentage.toFixed(2)}% / 100% Tokens Minted`;
     } catch (error) {
       console.error("Error fetching contract data:", error);
       document.getElementById('progressText').innerText = "Error loading data";
