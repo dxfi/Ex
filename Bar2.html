@@ -84,24 +84,28 @@
 
   const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
 
+  // Ambil jumlah desimal dari kontrak
+  async function getDecimals() {
+    const decimals = await contract.methods.decimals().call();
+    return parseInt(decimals);
+  }
+
   // Total pasokan maksimum yang bisa diminting
   const MAX_SUPPLY = 1000000;
 
   async function updateProgress() {
     try {
-      // Ambil jumlah desimal token
-      const decimals = await contract.methods.decimals().call();
-
       // Ambil total supply yang sudah diminting
       const mintedTokens = await contract.methods.totalSupply().call();
-      const minted = mintedTokens / (10 ** decimals); // Sesuaikan dengan desimal
+      const decimals = await getDecimals();
+      const minted = parseInt(mintedTokens) / Math.pow(10, decimals);
 
       // Hitung persentase progress
       const progressPercentage = (minted / MAX_SUPPLY) * 100;
 
       // Update tampilan
       document.getElementById('progressFill').style.width = progressPercentage + '%';
-      document.getElementById('progressText').innerText = `${minted.toFixed(0)} / ${MAX_SUPPLY} Tokens Minted`;
+      document.getElementById('progressText').innerText = `${minted.toFixed(2)} / ${MAX_SUPPLY} Tokens Minted`;
     } catch (error) {
       console.error("Error fetching contract data:", error);
       document.getElementById('progressText').innerText = "Error loading data";
